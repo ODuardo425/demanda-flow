@@ -5,7 +5,7 @@ import { AssignmentProcessor } from './assignment.processor';
 
 @Module({
   imports: [
-    BullModule.registerQueue({ name: 'assignment' }, { name: 'notifications' }),
+    //BullModule.registerQueue({ name: 'assignment' }, { name: 'notifications' }),
   ],
   providers: [AssignmentService, AssignmentProcessor],
   exports: [AssignmentService],

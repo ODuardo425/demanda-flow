@@ -5,11 +5,11 @@ import { StepsController } from './steps.controller';
 
 @Module({
   imports: [
-    BullModule.registerQueue(
-      { name: 'assignment' },
-      { name: 'workflow' },
-      { name: 'notifications' },
-    ),
+    //BullModule.registerQueue(
+      //{ name: 'assignment' },
+      //{ name: 'workflow' },
+      //{ name: 'notifications' },
+    //),
   ],
   controllers: [StepsController],
   providers: [StepsService],

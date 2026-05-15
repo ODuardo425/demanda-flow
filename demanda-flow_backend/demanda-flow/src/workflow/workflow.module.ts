@@ -5,11 +5,11 @@ import { WorkflowProcessor } from './workflow.processor';
 
 @Module({
   imports: [
-    BullModule.registerQueue(
-      { name: 'workflow' },
-      { name: 'assignment' },
-      { name: 'notifications' },
-    ),
+    //BullModule.registerQueue(
+      //{ name: 'workflow' },
+      //{ name: 'assignment' },
+      //{ name: 'notifications' },
+    //),
   ],
   providers: [WorkflowService, WorkflowProcessor],
   exports: [WorkflowService],

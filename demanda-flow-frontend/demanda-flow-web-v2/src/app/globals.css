@@ -1,0 +1,125 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=Sora:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bg: #FAFBFA;
+    --ink: #0A0F0E;
+  }
+
+  html, body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Manrope', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::selection {
+    background: #A3E635;
+    color: #0A0F0E;
+  }
+}
+
+@layer components {
+  /* Botões */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 font-semibold text-sm h-10 px-4 transition-all duration-200 rounded-md;
+  }
+  .btn-primary {
+    @apply btn bg-ink text-ivory hover:bg-forest-700 shadow-soft;
+  }
+  .btn-rust {
+    @apply btn bg-rust text-ivory hover:bg-rust-600 shadow-soft hover:shadow-glow;
+  }
+  .btn-volt {
+    @apply btn bg-volt text-ink hover:bg-volt-500 hover:shadow-volt;
+  }
+  .btn-ghost {
+    @apply btn bg-ivory text-ink border border-bone hover:border-rust hover:text-rust;
+  }
+  .btn-danger {
+    @apply btn bg-ivory text-ruby border border-ruby/30 hover:bg-ruby hover:text-ivory;
+  }
+
+  /* Inputs */
+  .input {
+    @apply w-full bg-transparent border-b-2 border-bone px-0 py-3 text-ink placeholder:text-ash focus:outline-none focus:border-rust transition-colors;
+    border-radius: 0;
+  }
+  .field-input {
+    @apply w-full bg-ivory border border-bone px-3.5 py-2.5 text-sm text-ink placeholder:text-ash focus:outline-none focus:border-rust focus:ring-4 focus:ring-rust/10 transition-all rounded-md;
+  }
+
+  /* Cards */
+  .card {
+    @apply bg-ivory border border-bone p-6 rounded-lg shadow-soft;
+  }
+  .card-elevated {
+    @apply bg-ivory p-6 rounded-lg shadow-lift;
+  }
+
+  /* Labels */
+  .label {
+    @apply text-[10px] uppercase tracking-[0.15em] text-ash font-semibold;
+  }
+
+  /* Chips */
+  .chip {
+    @apply inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-semibold rounded-full;
+  }
+
+  /* Badge de status com bolinha */
+  .status-dot {
+    @apply inline-flex items-center gap-2 text-xs font-medium;
+  }
+  .status-dot::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 999px;
+    background: currentColor;
+  }
+
+  /* Glow energético */
+  .glow-charge {
+    position: relative;
+    overflow: hidden;
+  }
+  .glow-charge::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(163, 230, 53, 0.15) 50%,
+      transparent 100%
+    );
+    animation: charge 2s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  /* Grid pattern background */
+  .bg-grid {
+    background-image: linear-gradient(rgba(16, 185, 129, 0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(16, 185, 129, 0.06) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+
+  /* Display heading */
+  .display {
+    font-family: 'Sora', system-ui, sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+}
+
+.scrollbar-thin::-webkit-scrollbar { width: 6px; height: 6px; }
+.scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+.scrollbar-thin::-webkit-scrollbar-thumb { background: #E5E7EB; border-radius: 3px; }
+.scrollbar-thin::-webkit-scrollbar-thumb:hover { background: #10B981; }

@@ -1,0 +1,86 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bg: #FAF7F2;
+    --ink: #1A1A1A;
+  }
+
+  html, body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    font-feature-settings: 'ss01', 'cv11';
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::selection {
+    background: #C2410C;
+    color: #FAF7F2;
+  }
+}
+
+@layer components {
+  .grain {
+    position: relative;
+  }
+  .grain::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.04;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100'><filter id='n'><feTurbulence baseFrequency='0.9' /></filter><rect width='100' height='100' filter='url(%23n)' /></svg>");
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 font-medium text-sm h-10 px-4 transition-all duration-200;
+    border-radius: 2px;
+  }
+  .btn-primary {
+    @apply btn bg-ink text-ivory hover:bg-rust-800;
+  }
+  .btn-rust {
+    @apply btn bg-rust text-ivory hover:bg-rust-800;
+  }
+  .btn-ghost {
+    @apply btn bg-transparent text-ink border border-bone hover:bg-cream;
+  }
+  .btn-danger {
+    @apply btn bg-transparent text-ruby border border-ruby/30 hover:bg-ruby hover:text-ivory;
+  }
+
+  .input {
+    @apply w-full bg-ivory border-b border-ink/30 px-0 py-2 text-ink placeholder:text-ash focus:outline-none focus:border-rust transition-colors;
+    border-radius: 0;
+  }
+  .field-input {
+    @apply w-full bg-cream/40 border border-bone px-3 py-2 text-sm text-ink placeholder:text-ash focus:outline-none focus:border-rust focus:bg-ivory transition-all;
+    border-radius: 2px;
+  }
+
+  .card {
+    @apply bg-ivory border border-bone p-6;
+    border-radius: 2px;
+  }
+
+  .label {
+    @apply text-[10px] uppercase tracking-[0.15em] text-ash font-medium;
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-1.5 px-2 py-0.5 text-[11px] font-medium font-mono;
+    border-radius: 1px;
+  }
+}
+
+.scrollbar-thin::-webkit-scrollbar { width: 6px; height: 6px; }
+.scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+.scrollbar-thin::-webkit-scrollbar-thumb { background: #E8E2D8; border-radius: 3px; }
+.scrollbar-thin::-webkit-scrollbar-thumb:hover { background: #C2410C; }

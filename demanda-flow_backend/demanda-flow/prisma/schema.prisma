@@ -1,0 +1,238 @@
+// Prisma schema — Demanda Flow
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================
+// IDENTIDADE
+// ============================================================
+
+enum Role {
+  ADMIN
+  USER
+}
+
+model User {
+  id                  String   @id @default(uuid())
+  name                String
+  email               String   @unique
+  passwordHash        String   @map("password_hash")
+  role                Role     @default(USER)
+  active              Boolean  @default(true)
+  maxConcurrentTasks  Int      @default(10) @map("max_concurrent_tasks")
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
+
+  skills              UserSkill[]
+  createdDemands      Demand[]        @relation("DemandCreatedBy")
+  assignedSteps       Step[]          @relation("StepAssignedTo")
+  comments            StepComment[]
+  attachments         StepAttachment[]
+  notifications       Notification[]
+  auditLogs           AuditLog[]
+
+  @@map("users")
+}
+
+model Skill {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  category    String?
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  users       UserSkill[]
+  steps       StepRequiredSkill[]
+
+  @@map("skills")
+}
+
+model UserSkill {
+  userId      String   @map("user_id")
+  skillId     String   @map("skill_id")
+  proficiency Int      @default(1) // 1..5
+  createdAt   DateTime @default(now()) @map("created_at")
+  expiresAt   DateTime? @map("expires_at")
+
+  user        User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  skill       Skill @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@id([userId, skillId])
+  @@map("user_skills")
+}
+
+// ============================================================
+// DEMANDAS E ETAPAS
+// ============================================================
+
+enum DemandStatus {
+  OPEN
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum StepStatus {
+  BLOCKED       // aguardando dependências
+  AVAILABLE     // pronto para atribuição
+  ASSIGNED      // atribuído mas não iniciado
+  IN_PROGRESS   // em execução
+  COMPLETED
+  CANCELLED
+  UNASSIGNABLE  // nenhum usuário com a habilidade
+}
+
+enum SkillMatchMode {
+  ANY  // basta uma habilidade
+  ALL  // precisa de todas
+}
+
+model Demand {
+  id          String       @id @default(uuid())
+  title       String
+  description String?
+  priority    Int          @default(3) // 1..5
+  status      DemandStatus @default(OPEN)
+  createdById String       @map("created_by")
+  deadline    DateTime?
+  createdAt   DateTime     @default(now()) @map("created_at")
+  completedAt DateTime?    @map("completed_at")
+  updatedAt   DateTime     @updatedAt @map("updated_at")
+
+  createdBy   User         @relation("DemandCreatedBy", fields: [createdById], references: [id])
+  steps       Step[]
+
+  @@index([status])
+  @@map("demands")
+}
+
+model Step {
+  id            String     @id @default(uuid())
+  demandId      String     @map("demand_id")
+  name          String
+  description   String?
+  orderIndex    Int        @map("order_index")
+  status        StepStatus @default(BLOCKED)
+  matchMode     SkillMatchMode @default(ANY) @map("match_mode")
+  assignedToId  String?    @map("assigned_to")
+  assignedAt    DateTime?  @map("assigned_at")
+  startedAt     DateTime?  @map("started_at")
+  completedAt   DateTime?  @map("completed_at")
+  deadline      DateTime?
+  expectedDurationHours Int? @map("expected_duration_hours")
+  createdAt     DateTime   @default(now()) @map("created_at")
+  updatedAt     DateTime   @updatedAt @map("updated_at")
+
+  demand        Demand     @relation(fields: [demandId], references: [id], onDelete: Cascade)
+  assignedTo    User?      @relation("StepAssignedTo", fields: [assignedToId], references: [id])
+
+  requiredSkills StepRequiredSkill[]
+  dependencies   StepDependency[] @relation("StepDependencies")
+  dependents     StepDependency[] @relation("StepDependents")
+  comments       StepComment[]
+  attachments    StepAttachment[]
+
+  @@index([assignedToId, status])
+  @@index([demandId])
+  @@map("steps")
+}
+
+model StepRequiredSkill {
+  stepId  String @map("step_id")
+  skillId String @map("skill_id")
+
+  step    Step  @relation(fields: [stepId], references: [id], onDelete: Cascade)
+  skill   Skill @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@id([stepId, skillId])
+  @@map("step_required_skills")
+}
+
+model StepDependency {
+  stepId           String @map("step_id")
+  dependsOnStepId  String @map("depends_on_step_id")
+
+  step             Step @relation("StepDependencies", fields: [stepId], references: [id], onDelete: Cascade)
+  dependsOnStep    Step @relation("StepDependents", fields: [dependsOnStepId], references: [id], onDelete: Cascade)
+
+  @@id([stepId, dependsOnStepId])
+  @@map("step_dependencies")
+}
+
+// ============================================================
+// COLABORAÇÃO
+// ============================================================
+
+model StepComment {
+  id        String   @id @default(uuid())
+  stepId    String   @map("step_id")
+  userId    String   @map("user_id")
+  content   String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  step Step @relation(fields: [stepId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("step_comments")
+}
+
+model StepAttachment {
+  id           String   @id @default(uuid())
+  stepId       String   @map("step_id")
+  uploadedById String   @map("uploaded_by")
+  fileUrl      String   @map("file_url")
+  fileName     String?  @map("file_name")
+  sizeBytes    BigInt?  @map("size_bytes")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  step       Step @relation(fields: [stepId], references: [id], onDelete: Cascade)
+  uploadedBy User @relation(fields: [uploadedById], references: [id])
+
+  @@map("step_attachments")
+}
+
+// ============================================================
+// NOTIFICAÇÕES E AUDITORIA
+// ============================================================
+
+enum NotificationType {
+  TASK_ASSIGNED
+  TASK_OVERDUE
+  DEPENDENCY_RELEASED
+  COMMENT_ADDED
+  TASK_REASSIGNED
+}
+
+model Notification {
+  id        String           @id @default(uuid())
+  userId    String           @map("user_id")
+  type      NotificationType
+  payload   Json
+  readAt    DateTime?        @map("read_at")
+  createdAt DateTime         @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, readAt])
+  @@map("notifications")
+}
+
+model AuditLog {
+  id         BigInt   @id @default(autoincrement())
+  entityType String   @map("entity_type")
+  entityId   String   @map("entity_id")
+  action     String
+  actorId    String?  @map("actor_id")
+  diff       Json?
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  actor User? @relation(fields: [actorId], references: [id])
+
+  @@index([entityType, entityId])
+  @@map("audit_log")
+}

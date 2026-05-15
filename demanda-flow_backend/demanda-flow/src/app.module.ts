@@ -16,12 +16,12 @@ import { DashboardModule } from './dashboard/dashboard.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
-    BullModule.forRoot({
-      connection: {
-        host: process.env.REDIS_HOST ?? 'localhost',
-        port: parseInt(process.env.REDIS_PORT ?? '6379', 10),
-      },
-    }),
+    //BullModule.forRoot({
+      //connection: {
+        //host: process.env.REDIS_HOST ?? 'localhost',
+        //port: parseInt(process.env.REDIS_PORT ?? '6379', 10),
+      //},
+    //}),
     PrismaModule,
     AuthModule,
     UsersModule,
@@ -35,3 +35,4 @@ import { DashboardModule } from './dashboard/dashboard.module';
   ],
 })
 export class AppModule {}
+//

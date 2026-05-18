@@ -15,13 +15,14 @@ import { DashboardModule } from './dashboard/dashboard.module';
 
 @Module({
   imports: [
+    
     ConfigModule.forRoot({ isGlobal: true }),
-    //BullModule.forRoot({
-      //connection: {
-        //host: process.env.REDIS_HOST ?? 'localhost',
-        //port: parseInt(process.env.REDIS_PORT ?? '6379', 10),
-      //},
-    //}),
+    BullModule.forRootAsync({
+      useFactory: () => ({
+        redis: {
+          url: process.env.REDIS_URL, // O valor será lido automaticamente do ambiente Render
+        },
+    }),
     PrismaModule,
     AuthModule,
     UsersModule,

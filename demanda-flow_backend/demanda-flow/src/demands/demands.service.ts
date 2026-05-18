@@ -1,8 +1,9 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectQueue } from '@nestjs/bullmq';
-import { Queue } from 'bullmq';
+import { Queue } from 'bull';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateDemandDto } from './dto/create-demand.dto';
+
 
 @Injectable()
 export class DemandsService {
